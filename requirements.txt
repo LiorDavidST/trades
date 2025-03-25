@@ -2,3 +2,4 @@ Flask==2.3.3
 pandas==2.1.4
 bokeh==3.3.4
 yfinance==0.2.36
+gunicorn==21.2.0
