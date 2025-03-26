@@ -1,11 +1,10 @@
 # --- fetch_data.py ---
 import yfinance as yf
 import pandas as pd
-from datetime import datetime
+from datetime import datetime, timedelta
 import os
 
-# נתיב חדש לשמירת הקבצים
-SAVE_DIRECTORY = r"D:\\PROJECTS\\TRADES"
+SAVE_DIRECTORY = r"D:\PROJECTS\TRADES"
 
 def calculate_rsi_wilder(data, period=14):
     delta = data['Close'].diff()
@@ -33,7 +32,10 @@ def calculate_bollinger_bands(data, period=20, std_multiplier=2):
 
 def fetch_stock_data(ticker, start, end, interval="1d"):
     try:
-        data = yf.download(ticker, start=start, end=end, interval=interval)
+        extended_start = (datetime.today() - timedelta(days=300)).strftime('%Y-%m-%d')
+        extended_end = datetime.today().strftime('%Y-%m-%d')
+
+        data = yf.download(ticker, start=extended_start, end=extended_end, interval=interval)
         if data.empty:
             return None
 
@@ -53,9 +55,12 @@ def fetch_stock_data(ticker, start, end, interval="1d"):
 
         data.reset_index(inplace=True)
 
+        data['Date'] = pd.to_datetime(data['Date'])
+        filtered_data = data[(data['Date'] >= pd.to_datetime(start)) & (data['Date'] <= pd.to_datetime(end))].copy()
+
         os.makedirs(SAVE_DIRECTORY, exist_ok=True)
         filename = os.path.join(SAVE_DIRECTORY, f"{ticker}_{start}_{end}.csv")
-        data.to_csv(filename, index=False)
+        filtered_data.to_csv(filename, index=False)
         return filename
 
     except Exception as e:

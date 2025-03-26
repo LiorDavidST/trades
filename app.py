@@ -12,7 +12,7 @@ from bokeh.resources import CDN
 
 app = Flask(__name__)
 
-TICKER_OPTIONS = ["AAPL", "TSLA", "MSFT", "AMZN", "GOOGL", "META", "TSLL"]
+TICKER_OPTIONS = ["TSLQ", "TSLL"]
 
 def default_date_range():
     end_date = datetime.today()
@@ -21,7 +21,7 @@ def default_date_range():
 
 @app.route("/", methods=["GET"])
 def index():
-    selected_ticker = request.args.get("ticker", "TSLL")
+    selected_ticker = request.args.get("ticker", "TSLQ")
     start_date = request.args.get("start_date")
     end_date = request.args.get("end_date")
 
@@ -36,7 +36,6 @@ def index():
     df = pd.read_csv(filename)
     df['Date'] = pd.to_datetime(df['Date'])
 
-    # הוספת מידע על כל שדה לתוך ColumnDataSource
     from bokeh.models import ColumnDataSource
     source = ColumnDataSource(df)
 
